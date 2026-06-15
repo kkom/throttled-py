@@ -1,6 +1,22 @@
 Version History
 ================
 
+v3.4.0 - 2026-06-16
+---------------------
+
+`简体中文 (v3.4.0) <https://github.com/ZhuoZhuoCrayon/throttled-py/blob/main/CHANGELOG.rst#v340---2026-06-16>`_ | English
+
+**🐛 Bug Fixes**
+
+- fix: map StoreUnavailableError to HTTP 503 in FastAPI contrib @s3ich4n (#168)
+
+**🚀 New Features**
+
+- feat: add FastAPI support (#149) @s3ich4n (#158)
+
+**Full Changelog**: https://github.com/ZhuoZhuoCrayon/throttled-py/compare/v3.3.1...v3.4.0
+
+
 v3.3.1 - 2026-05-17
 ---------------------
 

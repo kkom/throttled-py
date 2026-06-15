@@ -1,6 +1,22 @@
 Version History
 =================
 
+v3.4.0 - 2026-06-16
+---------------------
+
+`English Documents Available (v3.4.0) <https://github.com/ZhuoZhuoCrayon/throttled-py/blob/main/CHANGELOG_EN.rst#v340---2026-06-16>`_ | 简体中文
+
+**🐛 Bug 修复**
+
+- fix: 在 FastAPI contrib 中将 StoreUnavailableError 映射为 HTTP 503 @s3ich4n (#168)
+
+**🚀 功能**
+
+- feat: 新增 FastAPI 支持 (#149) @s3ich4n (#158)
+
+**完整更新日志**: https://github.com/ZhuoZhuoCrayon/throttled-py/compare/v3.3.1...v3.4.0
+
+
 v3.3.1 - 2026-05-17
 ---------------------
 
