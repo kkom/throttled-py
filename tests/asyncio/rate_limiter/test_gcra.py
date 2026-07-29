@@ -72,9 +72,6 @@ class TestGCRARateLimiter:
                 task=_task, batch=requests_num
             )
 
-    @pytest.mark.xfail(
-        reason="the allow_at derivation rounds against unseen keys", strict=True
-    )
     @classmethod
     async def test_limit__fresh_key_first_request_allowed(cls) -> None:
         """The first request for an unseen key passes when burst equals cost.
@@ -93,9 +90,6 @@ class TestGCRARateLimiter:
             assert not result.limited, f"first request rejected at now={now!r}"
             assert result.state.remaining == 0
 
-    @pytest.mark.xfail(
-        reason="the allow_at derivation rounds against unseen keys", strict=True
-    )
     @classmethod
     async def test_limit__fresh_key_first_request_allowed_redis(
         cls, redis_store: RedisStore
@@ -111,9 +105,6 @@ class TestGCRARateLimiter:
             assert not result.limited, f"first request rejected at time={now!r}"
             assert result.state.remaining == 0
 
-    @pytest.mark.xfail(
-        reason="the allow_at derivation rounds against unseen keys", strict=True
-    )
     @classmethod
     async def test_peek__fresh_key_reports_full_burst(cls) -> None:
         """Peek on an unseen key reports the whole burst as remaining.
@@ -133,9 +124,6 @@ class TestGCRARateLimiter:
                 limit=1, remaining=1, reset_after=0, retry_after=0
             ), f"peek misreported at now={now!r}"
 
-    @pytest.mark.xfail(
-        reason="the allow_at derivation rounds against unseen keys", strict=True
-    )
     @classmethod
     async def test_peek__fresh_key_reports_full_burst_redis(
         cls, redis_store: RedisStore

@@ -18,17 +18,15 @@ else
     tat= tonumber(tat)
 end
 
--- Calculate the fill time required for the full capacity.
-local fill_time_for_capacity = capacity * emission_interval
--- Calculate the the time when the request would be allowed.
-local allow_at = math.max(tat, now) - fill_time_for_capacity
+-- Calculate the time from the theoretical arrival time (TAT), at most zero.
+local time_from_tat = now - math.max(tat, now)
 -- Calculate the time elapsed since the request would be allowed.
-local time_elapsed = now - allow_at
+local time_elapsed = time_from_tat + capacity * emission_interval
 
 local limited = 0
 local retry_after = 0
 local reset_after = math.max(0, tat - now)
-local remaining = math.floor(time_elapsed / emission_interval)
+local remaining = capacity + math.floor(time_from_tat / emission_interval)
 if remaining < 1 then
     limited = 1
     remaining = 0
