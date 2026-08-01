@@ -22,20 +22,18 @@ end
 
 -- Calculate the fill time required for the current cost.
 local fill_time_for_cost = cost * emission_interval
--- Calculate the fill time required for the full capacity.
-local fill_time_for_capacity = capacity * emission_interval
 -- Calculate the theoretical arrival time (TAT) for the current request.
 local tat = math.max(now, last_tat) + fill_time_for_cost
--- Calculate the the time when the request would be allowed.
-local allow_at = tat - fill_time_for_capacity
+-- Calculate the time from the last theoretical arrival time (TAT), at most zero.
+local time_from_tat = now - math.max(now, last_tat)
 -- Calculate the time elapsed since the request would be allowed.
-local time_elapsed = now - allow_at
+local time_elapsed = time_from_tat + (capacity - cost) * emission_interval
 
 
 local limited = 0
 local retry_after = 0
 local reset_after = tat - now
-local remaining = math.floor(time_elapsed / emission_interval)
+local remaining = (capacity - cost) + math.floor(time_from_tat / emission_interval)
 if remaining < 0 then
     limited = 1
     retry_after = time_elapsed * -1

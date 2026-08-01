@@ -31,15 +31,14 @@ class RedisLimitAtomicActionSpec:
     end
 
     local fill_time_for_cost = cost * emission_interval
-    local fill_time_for_capacity = capacity * emission_interval
     local tat = math.max(now, last_tat) + fill_time_for_cost
-    local allow_at = tat - fill_time_for_capacity
-    local time_elapsed = now - allow_at
+    local time_from_tat = now - math.max(now, last_tat)
+    local time_elapsed = time_from_tat + (capacity - cost) * emission_interval
 
     local limited = 0
     local retry_after = 0
     local reset_after = tat - now
-    local remaining = math.floor(time_elapsed / emission_interval)
+    local remaining = (capacity - cost) + math.floor(time_from_tat / emission_interval)
     if remaining < 0 then
         limited = 1
         retry_after = time_elapsed * -1
@@ -75,14 +74,13 @@ class RedisPeekAtomicActionSpec:
         tat= tonumber(tat)
     end
 
-    local fill_time_for_capacity = capacity * emission_interval
-    local allow_at = math.max(tat, now) - fill_time_for_capacity
-    local time_elapsed = now - allow_at
+    local time_from_tat = now - math.max(tat, now)
+    local time_elapsed = time_from_tat + capacity * emission_interval
 
     local limited = 0
     local retry_after = 0
     local reset_after = math.max(0, tat - now)
-    local remaining = math.floor(time_elapsed / emission_interval)
+    local remaining = capacity + math.floor(time_from_tat / emission_interval)
     if remaining < 1 then
         limited = 1
         remaining = 0
@@ -152,12 +150,11 @@ class MemoryLimitActionLogic:
         last_tat: float = float(backend.get(key) or now)
 
         fill_time_for_cost: float = cost * emission_interval
-        fill_time_for_capacity: float = capacity * emission_interval
         tat: float = max(now, last_tat) + fill_time_for_cost
-        allow_at: float = tat - fill_time_for_capacity
-        time_elapsed: float = now - allow_at
+        time_from_tat: float = now - max(now, last_tat)
+        time_elapsed: float = time_from_tat + (capacity - cost) * emission_interval
 
-        remaining: int = math.floor(time_elapsed / emission_interval)
+        remaining: int = capacity - cost + math.floor(time_from_tat / emission_interval)
         limited: int = 0
         retry_after: float = 0.0
         reset_after: float = tat - now
@@ -200,12 +197,11 @@ class MemoryPeekActionLogic:
 
         now: float = utils.now_mono_f()
         tat: float = float(backend.get(key) or now)
-        fill_time_for_capacity: float = capacity * emission_interval
-        allow_at: float = max(now, tat) - fill_time_for_capacity
-        time_elapsed: float = now - allow_at
+        time_from_tat: float = now - max(now, tat)
+        time_elapsed: float = time_from_tat + capacity * emission_interval
 
         reset_after: float = max(0.0, tat - now)
-        remaining: int = math.floor(time_elapsed / emission_interval)
+        remaining: int = capacity + math.floor(time_from_tat / emission_interval)
         limited: int = 0
         retry_after: float = 0.0
         if remaining < 1:
