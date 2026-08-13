@@ -175,7 +175,34 @@ via the ``options.REDIS_CLIENT_KWARGS`` parameter.
   when omitted.
 
 
-3) References
+.. _store-backends-key-prefix:
+
+3) Key Prefix
+=================
+
+Storage keys are namespaced under ``throttled`` by default - a key ``k`` limited by the GCRA algorithm
+is stored as ``throttled:v1:gcra:k``, where ``v1`` versions the stored state format.
+
+Pass ``key_prefix`` to :class:`Throttled <throttled.Throttled>` to replace the ``throttled`` namespace
+with your own. The schema version and rate limiter type are still appended after the namespace, so a
+stored-state format change or an algorithm switch never misreads existing keys.
+
+.. tab-set::
+
+    .. tab-item:: Sync
+        :sync: sync
+
+        .. literalinclude:: ../../../examples/quickstart/key_prefix_example.py
+           :language: python
+
+    .. tab-item:: Async
+        :sync: async
+
+        .. literalinclude:: ../../../examples/quickstart/async/key_prefix_example.py
+           :language: python
+
+
+4) References
 =================
 
 - `redis-py Connecting to Redis <https://redis.readthedocs.io/en/stable/connections.html#connecting-to-redis>`_

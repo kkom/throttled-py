@@ -305,6 +305,29 @@ ping()
 pong()
 ```
 
+#### Key 前缀
+
+存储 Key 默认位于 `throttled` 命名空间下——例如使用 GCRA 算法限流的 Key `k`，实际存储为 `throttled:v1:gcra:k`，其中 `v1` 是存储状态格式的版本号。
+
+通过 **`key_prefix`** 可以将 `throttled` 命名空间替换为你自己的。版本号和限流算法类型仍会追加在命名空间之后，因此存储格式变更或算法切换不会误读已有的 Key：
+
+```python
+from throttled import RateLimiterType, Throttled, store
+
+mem_store = store.MemoryStore()
+
+throttle = Throttled(
+    key="/api/products",
+    using=RateLimiterType.GCRA.value,
+    quota="60/m",
+    store=mem_store,
+    key_prefix="my-app:rate-limit",
+)
+
+throttle.limit()
+print(mem_store.exists("my-app:rate-limit:v1:gcra:/api/products"))  # True
+```
+
 ### 3）指定限流算法
 
 通过 **`using`** 参数指定限流算法，支持算法如下：

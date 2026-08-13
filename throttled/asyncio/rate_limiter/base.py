@@ -52,9 +52,11 @@ class BaseRateLimiter(
         quota: rate_limiter.Quota,
         store: "BaseStore",
         additional_atomic_actions: "Sequence[type[BaseAtomicAction]] | None" = None,
+        key_prefix: str | None = None,
     ) -> None:
         self.quota: rate_limiter.Quota = quota
         self._store = store
+        self._key_prefix = self._resolve_key_prefix(key_prefix)
         self._atomic_actions = {}
         self._register_atomic_actions(additional_atomic_actions or ())
 

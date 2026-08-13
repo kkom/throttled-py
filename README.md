@@ -295,6 +295,29 @@ ping()  # Success
 pong()  # Raises LimitedError
 ```
 
+#### Key Prefix
+
+Storage keys are namespaced under `throttled` by default - a key `k` limited by the GCRA algorithm is stored as `throttled:v1:gcra:k`, where `v1` versions the stored state format.
+
+Pass **`key_prefix`** to replace the `throttled` namespace with your own. The schema version and rate limiter type are still appended after the namespace, so a stored-state format change or an algorithm switch never misreads existing keys:
+
+```python
+from throttled import RateLimiterType, Throttled, store
+
+mem_store = store.MemoryStore()
+
+throttle = Throttled(
+    key="/api/products",
+    using=RateLimiterType.GCRA.value,
+    quota="60/m",
+    store=mem_store,
+    key_prefix="my-app:rate-limit",
+)
+
+throttle.limit()
+print(mem_store.exists("my-app:rate-limit:v1:gcra:/api/products"))  # True
+```
+
 ### 3) Algorithms
 
 The rate limiting algorithm is specified by the **`using`** parameter. The supported algorithms are as follows:

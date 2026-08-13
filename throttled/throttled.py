@@ -36,6 +36,7 @@ class BaseThrottled(ThrottledLogic, abc.ABC):
         "_store",
         "_limiter_cls",
         "_limiter",
+        "_key_prefix",
         "_lock",
         "_hooks",
     )
@@ -53,6 +54,7 @@ class BaseThrottled(ThrottledLogic, abc.ABC):
         store: BaseStore | None = None,
         cost: int = 1,
         hooks: Sequence[Hook] | None = None,
+        key_prefix: str | None = None,
     ) -> None:
         """Initializes the Throttled class.
 
@@ -76,8 +78,11 @@ class BaseThrottled(ThrottledLogic, abc.ABC):
             quota it consumes, default: 1.
         :param hooks: A sequence of hooks invoked by the middleware before and/or after
             each ``limit()`` operation, including any internal retries.
+        :param key_prefix: The namespace under which storage keys live, default:
+            ``throttled``. The storage schema version and rate limiter type are
+            always appended, so keys are stored under
+            ``<key_prefix>:v1:<rate limiter type>:``.
         """
-        # TODO Support key prefix.
         # TODO Support extract key from params.
         # TODO Support get cost weight by key.
         self.key: str | None = key
@@ -90,6 +95,8 @@ class BaseThrottled(ThrottledLogic, abc.ABC):
         self._limiter_cls: type[BaseRateLimiter] = self._REGISTRY_CLASS.get(
             using or self._DEFAULT_RATE_LIMITER_TYPE
         )
+
+        self._key_prefix: str | None = key_prefix
 
         self._lock: LockType = self._get_lock()
         self._limiter: BaseRateLimiter | None = None
@@ -116,7 +123,7 @@ class BaseThrottled(ThrottledLogic, abc.ABC):
                 return limiter
 
             created_limiter: BaseRateLimiter = self._limiter_cls(
-                self._quota, self._store
+                self._quota, self._store, key_prefix=self._key_prefix
             )
             self._limiter = created_limiter
             return created_limiter

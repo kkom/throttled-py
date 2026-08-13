@@ -230,3 +230,46 @@ class TestThrottled:
         # Hook should be called exactly 2 times (once per limit() call)
         # NOT more times due to internal retry attempts
         assert call_count == EXPECTED_HOOK_CALL_COUNT
+
+
+class TestKeyPrefix:
+    @classmethod
+    def test_limit__default_key_prefix(cls) -> None:
+        """Keys are stored under ``throttled:v1:<rate limiter type>:`` by default."""
+        mem_store: store.MemoryStore = store.MemoryStore()
+        throttle: Throttled = Throttled(
+            key="key",
+            using=RateLimiterType.GCRA.value,
+            quota=per_sec(1),
+            store=mem_store,
+        )
+        throttle.limit()
+        assert mem_store.exists("throttled:v1:gcra:key")
+
+    @classmethod
+    def test_limit__custom_key_prefix(cls) -> None:
+        """A provided key_prefix replaces the default throttled: namespace."""
+        mem_store: store.MemoryStore = store.MemoryStore()
+        throttle: Throttled = Throttled(
+            key="key",
+            using=RateLimiterType.GCRA.value,
+            quota=per_sec(1),
+            store=mem_store,
+            key_prefix="my-app:rate-limit",
+        )
+        throttle.limit()
+        assert mem_store.exists("my-app:rate-limit:v1:gcra:key")
+        assert not mem_store.exists("throttled:v1:gcra:key")
+
+    @classmethod
+    def test_peek__custom_key_prefix(cls) -> None:
+        """peek reads the key that limit wrote; a mismatch would look fresh."""
+        throttle: Throttled = Throttled(
+            key="key",
+            using=RateLimiterType.GCRA.value,
+            quota=per_sec(1),
+            store=store.MemoryStore(),
+            key_prefix="my-app:rate-limit",
+        )
+        throttle.limit()
+        assert throttle.peek("key").remaining == 0
