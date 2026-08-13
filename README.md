@@ -299,7 +299,7 @@ pong()  # Raises LimitedError
 
 Storage keys are namespaced under `throttled` by default - a key `k` limited by the GCRA algorithm is stored as `throttled:v1:gcra:k`, where `v1` versions the stored state format.
 
-Pass **`key_prefix`** to replace the `throttled` namespace with your own. The schema version and rate limiter type are still appended after the namespace, so a stored-state format change or an algorithm switch never misreads existing keys:
+Pass **`key_prefix`** to replace the `throttled` namespace with your own. It must be non-empty and must not start or end with `:`. The schema version and rate limiter type are still appended after the namespace, so a stored-state format change or an algorithm switch never misreads existing keys:
 
 ```python
 from throttled import RateLimiterType, Throttled, store

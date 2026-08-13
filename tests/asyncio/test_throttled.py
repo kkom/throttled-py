@@ -217,3 +217,10 @@ class TestKeyPrefix:
         )
         await throttle.limit()
         assert (await throttle.peek("key")).remaining == 0
+
+    @classmethod
+    @pytest.mark.parametrize("key_prefix", ["", ":", ":my-app", "my-app:"])
+    async def test_constructor__invalid_key_prefix(cls, key_prefix: str) -> None:
+        """An empty or colon-edged namespace would produce malformed storage keys."""
+        with pytest.raises(exceptions.DataError, match="Invalid key_prefix"):
+            Throttled(key_prefix=key_prefix)

@@ -76,7 +76,8 @@ class BaseThrottled(ThrottledLogic, abc.ABC):
         :param key_prefix: The namespace under which storage keys live, default:
             ``throttled``. The storage schema version and rate limiter type are
             always appended, so keys are stored under
-            ``<key_prefix>:v1:<rate limiter type>:``.
+            ``<key_prefix>:v1:<rate limiter type>:``. Must be non-empty and must
+            not start or end with ``:``.
         """
         self.key: str | None = key
 
@@ -88,6 +89,7 @@ class BaseThrottled(ThrottledLogic, abc.ABC):
         self._limiter_cls: type[BaseRateLimiter] = self._REGISTRY_CLASS.get(
             using or self._DEFAULT_RATE_LIMITER_TYPE
         )
+        self._validate_key_prefix(key_prefix)
         self._key_prefix: str | None = key_prefix
         self._limiter: BaseRateLimiter | None = None
         self._hooks: tuple[Hook, ...] = self._validate_hooks(hooks)

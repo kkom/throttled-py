@@ -81,7 +81,8 @@ class BaseThrottled(ThrottledLogic, abc.ABC):
         :param key_prefix: The namespace under which storage keys live, default:
             ``throttled``. The storage schema version and rate limiter type are
             always appended, so keys are stored under
-            ``<key_prefix>:v1:<rate limiter type>:``.
+            ``<key_prefix>:v1:<rate limiter type>:``. Must be non-empty and must
+            not start or end with ``:``.
         """
         # TODO Support extract key from params.
         # TODO Support get cost weight by key.
@@ -96,6 +97,7 @@ class BaseThrottled(ThrottledLogic, abc.ABC):
             using or self._DEFAULT_RATE_LIMITER_TYPE
         )
 
+        self._validate_key_prefix(key_prefix)
         self._key_prefix: str | None = key_prefix
 
         self._lock: LockType = self._get_lock()
