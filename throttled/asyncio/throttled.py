@@ -76,8 +76,8 @@ class BaseThrottled(ThrottledLogic, abc.ABC):
         :param key_prefix: The namespace under which storage keys live, default:
             ``throttled``. The storage schema version and rate limiter type are
             always appended, so keys are stored under
-            ``<key_prefix>:v1:<rate limiter type>:``. Must be non-empty and must
-            not start or end with ``:``.
+            ``<key_prefix>:v1:<rate limiter type>:``. Must be a non-blank
+            string and must not start or end with ``:``.
         """
         self.key: str | None = key
 
@@ -104,9 +104,16 @@ class BaseThrottled(ThrottledLogic, abc.ABC):
         if limiter is not None:
             return limiter
 
-        created_limiter: BaseRateLimiter = self._limiter_cls(
-            self._quota, self._store, key_prefix=self._key_prefix
-        )
+        # The legacy constructor call is kept for registered limiters that
+        # predate the key_prefix parameter.
+        if self._key_prefix is None:
+            created_limiter: BaseRateLimiter = self._limiter_cls(
+                self._quota, self._store
+            )
+        else:
+            created_limiter = self._limiter_cls(
+                self._quota, self._store, key_prefix=self._key_prefix
+            )
         self._limiter = created_limiter
         return created_limiter
 

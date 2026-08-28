@@ -59,23 +59,12 @@ class ThrottledLogic:
         :param key_prefix: The namespace under which storage keys live,
             or None for the default.
         :raise: :class:`throttled.exceptions.DataError` if the key prefix is
-            not a non-empty string, or starts or ends with ``:``.
+            not a non-blank string, or starts or ends with ``:``.
         """
         if key_prefix is None:
             return
 
-        if (
-            isinstance(key_prefix, str)
-            and len(key_prefix) > 0
-            and not key_prefix.startswith(":")
-            and not key_prefix.endswith(":")
-        ):
-            return
-
-        raise exceptions.DataError(
-            f"Invalid key_prefix: {key_prefix!r}, must be a non-empty string "
-            "that does not start or end with ':'."
-        )
+        rate_limiter.validate_key_prefix(key_prefix)
 
     @classmethod
     def _parse_quota(cls, quota: rate_limiter.Quota | str | None) -> rate_limiter.Quota:

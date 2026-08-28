@@ -15,6 +15,7 @@ from .base import (
     per_min,
     per_sec,
     per_week,
+    validate_key_prefix,
 )
 
 # Trigger to register RateLimiter
@@ -44,4 +45,5 @@ __all__ = [
     "TokenBucketRateLimiter",
     "LeakingBucketRateLimiter",
     "GCRARateLimiter",
+    "validate_key_prefix",
 ]
