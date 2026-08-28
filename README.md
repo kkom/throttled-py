@@ -5,7 +5,7 @@
 
 <p align="center">
     <a href="https://github.com/ZhuoZhuoCrayon/throttled-py">
-        <img src="https://img.shields.io/badge/python-%3E%3D3.8-green?logo=python" alt="Python">
+        <img src="https://img.shields.io/badge/python-%3E%3D3.10-green?logo=python" alt="Python">
     </a>
      <a href="https://github.com/ZhuoZhuoCrayon/throttled-py">
         <img src="https://codecov.io/gh/ZhuoZhuoCrayon/throttled-py/graph/badge.svg" alt="Coverage Status">
@@ -62,6 +62,8 @@ To enable additional features, install optional dependencies as follows (multipl
 $ pip install "throttled-py[redis]"
 
 $ pip install "throttled-py[otel]"
+
+$ pip install "throttled-py[fastapi]"
 
 $ pip install "throttled-py[flask]"
 
